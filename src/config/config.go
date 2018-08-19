@@ -7,9 +7,10 @@ const (
 )
 
 type Config struct {
-	Host       string
-	Port       int
-	MaxWorkers uint
+	Host                 string
+	Port                 int
+	MaxWorkers           uint
+	GarbageCollectorTick int64
 }
 
 func NewConfig(host string, port int, maxWorkers uint) (config *Config, err error) {
@@ -26,5 +27,6 @@ func NewConfig(host string, port int, maxWorkers uint) (config *Config, err erro
 		host,
 		port,
 		maxWorkers,
+		10000,
 	}, err
 }

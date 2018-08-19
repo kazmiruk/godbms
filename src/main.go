@@ -11,15 +11,14 @@ func main() {
 	conf, err := config.NewConfig("0.0.0.0", 3333, 1)
 
 	if err != nil {
-		fmt.Println("Error building config: ", err.Error())
+		fmt.Println("ERROR: Error building config: ", err.Error())
 		os.Exit(1)
 	}
 
-	serv := server.NewServer(*conf)
-	err = serv.Start()
+	err = server.NewServer(*conf).Start()
 
 	if err != nil {
-		fmt.Println("Error starting:", err.Error())
+		fmt.Println("ERROR: Error starting:", err.Error())
 		os.Exit(2)
 	}
 }

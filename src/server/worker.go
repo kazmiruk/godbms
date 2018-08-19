@@ -2,17 +2,20 @@ package server
 
 import (
 	"bufio"
-	"fmt"
+	"godbms/src/storages"
 	"net"
+	"strings"
 )
 
 type WorkerWrapper struct {
-	conn net.Conn
+	conn     net.Conn
+	storages *storages.Storages
 }
 
-func NewConnectionWrapper(conn net.Conn) *WorkerWrapper {
+func NewConnectionWrapper(storages *storages.Storages, conn net.Conn) *WorkerWrapper {
 	return &WorkerWrapper{
-		conn: conn,
+		conn:     conn,
+		storages: storages,
 	}
 }
 
@@ -33,11 +36,17 @@ func (wrapper *WorkerWrapper) readln(r *bufio.Reader) (string, error) {
 }
 
 func (wrapper *WorkerWrapper) OnAddToPool() {
-	fmt.Fprintf(wrapper.conn, "Connection waits in the pool\r\n")
 }
 
 func (wrapper *WorkerWrapper) OnGetFromPool() {
-	fmt.Fprintf(wrapper.conn, "Connection was takken from the pool\r\n")
+}
+
+func (wrapper *WorkerWrapper) GetStorages() (storages *storages.Storages) {
+	return wrapper.storages
+}
+
+func (wrapper *WorkerWrapper) GetConnection() (conn net.Conn) {
+	return wrapper.conn
 }
 
 func (wrapper *WorkerWrapper) Run() {
@@ -45,16 +54,12 @@ func (wrapper *WorkerWrapper) Run() {
 	reader := bufio.NewReader(wrapper.conn)
 
 	for {
-		fmt.Fprintf(wrapper.conn, "Enter the word 'quit' (with no quotes) to exit.\r\n")
+		commandStr, _ := wrapper.readln(reader)
 
-		str, _ := wrapper.readln(reader)
-
-		if str == "quit" {
-			fmt.Println("Quitting.")
+		if strings.ToLower(commandStr) == "quit" {
 			break
 		}
 
-		fmt.Println("Input:" + str)
-		_, _ = fmt.Fprintf(wrapper.conn, "You said: %s\r\n", str)
+		CommandProcessor(wrapper, commandStr)
 	}
 }
