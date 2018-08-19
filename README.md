@@ -4,8 +4,8 @@ Simple key-value storage with records expiring.
 
 ## Commands
 
-**kv \<storage_name\> create** - create key-value storage
+**_kv \<storage_name\> create_** - create key-value storage
 
-**kv \<storage_name\> set \<key\> \<expire\> \<value\>** - set key in storage with expire time (-1 - not expires)
+**_kv \<storage_name\> set \<key\> \<expire\> \<value\>_** - set key in storage with expire time (-1 - not expires)
 
-**kv \<storage_name\> get <key>** - get value from storage by key
+**_kv \<storage_name\> get \<key\>_** - get value from storage by key
