@@ -2,6 +2,7 @@ package server
 
 import (
 	"bufio"
+	"fmt"
 	"godbms/src/storages"
 	"net"
 	"strings"
@@ -19,22 +20,6 @@ func NewConnectionWrapper(storages *storages.Storages, conn net.Conn) *WorkerWra
 	}
 }
 
-func (wrapper *WorkerWrapper) readln(r *bufio.Reader) (string, error) {
-	input, err := r.ReadString('\n')
-
-	if err != nil {
-		return "", err
-	}
-
-	input = input[:len(input)-1]
-
-	if len(input) > 0 && input[len(input)-1] == '\r' {
-		input = input[:len(input)-1]
-	}
-
-	return input, nil
-}
-
 func (wrapper *WorkerWrapper) OnAddToPool() {
 }
 
@@ -49,12 +34,17 @@ func (wrapper *WorkerWrapper) GetConnection() (conn net.Conn) {
 	return wrapper.conn
 }
 
-func (wrapper *WorkerWrapper) Run() {
-	defer wrapper.conn.Close()
-	reader := bufio.NewReader(wrapper.conn)
+func (wrapper *WorkerWrapper) Close() {
+	fmt.Println("INFO: connection " + wrapper.conn.RemoteAddr().String() + " closed")
+	wrapper.conn.Close()
+}
 
-	for {
-		commandStr, _ := wrapper.readln(reader)
+func (wrapper *WorkerWrapper) Run() {
+	defer wrapper.Close()
+	scanner := bufio.NewScanner(wrapper.conn)
+
+	for scanner.Scan() {
+		commandStr := scanner.Text()
 
 		if strings.ToLower(commandStr) == "quit" {
 			break

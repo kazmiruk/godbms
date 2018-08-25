@@ -34,6 +34,7 @@ func (server *Server) Start() (err error) {
 	for {
 		conn, _ := server.listener.Accept()
 
+		fmt.Println("INFO: connected " + conn.RemoteAddr().String())
 		server.pool.AddToProcess(NewConnectionWrapper(server.storages, conn))
 	}
 
